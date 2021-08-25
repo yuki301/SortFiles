@@ -1,4 +1,5 @@
-import os
+import os,languagestr
+
 
 def get_dirs(root_path):#获得路径下所有文件的名字、路径，并按照(文件名,文件路径)的元组存入列表all_fself
     all_fself=[]
@@ -30,9 +31,8 @@ def show_res(all_fself,show_num=0):#输出排序结果，show_num为0或不填�
         print(f'{i}.{fself[0]}:{fself[2]/(1024*1024)}MB')
         n-=1
 
-def get_command():#获得用户输入的指令，处理后返回需要的变量
-    user_command = input("Please enter a command.Like'\033[33m[FilePath] [ShowNumber(Optional)]\033[0m'.\n"
-                        ">>>")
+def get_command(language):#获得用户输入的指令，处理后返回需要的变量
+    user_command = input(language.str_user_command)
     if '[' in user_command:
         root_path, show_num = user_command.split(sep=' ')#考虑用正则提取
         root_path = root_path.replace('[', '')
@@ -41,17 +41,36 @@ def get_command():#获得用户输入的指令，处理后返回需要的变量
         show_num = show_num.replace(']', '')
         return root_path,int(show_num)
     else:
-        print("Warning: Each parameter requires a '[]' declaration.")
+        print(language.str_warning_command)
+
+
+def language_choose():
+    while True:
+        try:
+            choose = int(input('Please choose the language(input number):\n'
+                                    '1.Chinese\n'
+                                    '2.English\n'
+                                    '>>>'))
+
+            if choose==1:
+                return languagestr.Chinese
+            elif choose==2:
+                return languagestr.English
+
+            print('\033[31mFailed,please try again.\033[0m')
+        except BaseException as e:
+            print('\033[31mFailed,please try again.\033[0m')
 
 
 
 def main():
+    language=language_choose()
     while True:
         try:
-            root_path,show_num=get_command()
+            root_path,show_num=get_command(language)
         except BaseException as e:
-            print('\033[31mFailed, please input again.\033[0m')
-        input('Press enter to continue.')
+            print(language.str_input_again)
+            continue
 
         try:
             all_fself=get_dirs(root_path)
@@ -59,7 +78,9 @@ def main():
             sort_file(all_fself)
             show_res(all_fself,show_num)
         except BaseException as e:
-            print('\033[31mFailed.\033[0m')
+            print(language.str_failed)
+
+        input(language.str_enter_continue)
 
 
 if __name__ == '__main__':
@@ -72,4 +93,5 @@ if __name__ == '__main__':
 #4.优化扫描排列速度
 #5.有空加一个GUI
 #6.指令型交互 (完成)
-#7.多语言选择
+#7.多语言选择(完成)
+#8.显示和选择显示数量有bug
